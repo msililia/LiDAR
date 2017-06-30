@@ -5,11 +5,11 @@ using namespace std;
 bool live = false;
 pcap_t *handle; // session handle
 int BUFSIZE = 100;
-char device[] = "lidar"; // device to sniff on
+const char* device = "lidar"; // device to sniff on
 bool promisc = false;
 int to_ms = 1000;
-string ebuf; // errr string
-string file_name = "Highway.pcap" // filename for offline mode
+char errbuf[PCAP_ERRBUF_SIZE];  // errr string
+const char* file_name = "Highway.pcap"; // filename for offline mode
 /*When pcap_loop(..) is called it will grab cnt packets (
 it will loop infinitely when cnt is -1) and pass them to
 the callback function
@@ -21,7 +21,7 @@ int cnt = 8;
 void my_callback(u_char *useless,const struct pcap_pkthdr* pkthdr,const u_char*
         packet)
 {
-    // In here every cnt packets 
+    // In here every cnt packets
     // This is where we begin to detect objects.
     printf("Hello there");
 }
@@ -46,11 +46,11 @@ int main()
     }
     else {
         // using recorded stored pcaps.
-        handle = pcap_open_offline(file_name,ebuf)
+        handle = pcap_open_offline(file_name,errbuf);
     }
 
     if (handle == NULL) {
-        fprintf(stderr, "Couldn't open  %s: %s\n", dev, errbuf);
+        fprintf(stderr, "Couldn't open  %s: \n", errbuf);
         return(2);
     }
 

@@ -9,36 +9,62 @@ char device[] = "lidar"; // device to sniff on
 bool promisc = false;
 int to_ms = 1000;
 string ebuf; // errr string
+string file_name = "Highway.pcap" // filename for offline mode
+/*When pcap_loop(..) is called it will grab cnt packets (
+it will loop infinitely when cnt is -1) and pass them to
+the callback function
+*/
+int cnt = 8;
+
+/* callback function that is passed to pcap_loop(..) and called each time
+ * a packet is recieved                                                    */
+void my_callback(u_char *useless,const struct pcap_pkthdr* pkthdr,const u_char*
+        packet)
+{
+    // In here every cnt packets 
+    // This is where we begin to detect objects.
+    printf("Hello there");
+}
+
 
 int main()
 {
     cout << "Hello world!" << endl;
     if (live){
+        /*
+       Device - device name
+       BUFSIZE - maximum size of packets to capture in bytes
+       promisc - set card in promiscuous mode
+       to_ms   - time to wait for packets in miliseconds before read
+       times out
+       errbuf  - if something happens, place error string here
+
+        */
 
         // establish sniffer
-
-        /*
-
-        The first argument is the device
-        BUFSIZE is an integer which defines the maximum number of bytes to be captured by pcap
-        Third parameter is promisc, when set to false, brings the interface into promiscuous mode
-        (however, even if it is set to false, it is possible under specific cases for the interface to be in promiscuous mode, anyway).
-        to_ms is the read time out in milliseconds (a value of 0 means no time out;
-        on at least some platforms, this means that you may wait until a sufficient number of packets arrive before seeing any packets,
-        so you should use a non-zero timeout).
-        Lastly, ebuf is a string we can store any error messages within
-        The function returns our session handler.
-        */
-        handle = pcap_open_live(device, BUFSIZE, promisc,  to_ms, )
-
-        if (handle == NULL) {
-            fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
-            return(2);
-        }
+        handle = pcap_open_live(device, BUFSIZE, promisc,  to_ms, errbuf);
     }
     else {
         // using recorded stored pcaps.
-
+        handle = pcap_open_offline(file_name,ebuf)
     }
+
+    if (handle == NULL) {
+        fprintf(stderr, "Couldn't open  %s: %s\n", dev, errbuf);
+        return(2);
+    }
+
+    // loop through every packet, calling the callback function when cnt packets accumlated.
+    if (pcap_loop(handle, cnt, my_callback, NULL) < 0) {
+        cout << "pcap_loop() failed: " << pcap_geterr(handle);
+        return 1;
+    }
+
+      cout << "capture finished" << endl;
+
+    /* And close the session */
+    pcap_close(handle);
+
+
     return 0;
 }

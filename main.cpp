@@ -1,97 +1,44 @@
-// <string> Forward declarations -*- C++ -*-
+#include <iostream>
+#include <pcap.h>
 
-// Copyright (C) 2001-2015 Free Software Foundation, Inc.
-//
-// This file is part of the GNU ISO C++ Library.  This library is free
-// software; you can redistribute it and/or modify it under the
-// terms of the GNU General Public License as published by the
-// Free Software Foundation; either version 3, or (at your option)
-// any later version.
+using namespace std;
+bool live = false;
+pcap_t *handle; // session handle
+int BUFSIZE = 100;
+char device[] = "lidar"; // device to sniff on
+bool promisc = false;
+int to_ms = 1000;
+string ebuf; // errr string
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// Under Section 7 of GPL version 3, you are granted additional
-// permissions described in the GCC Runtime Library Exception, version
-// 3.1, as published by the Free Software Foundation.
-
-// You should have received a copy of the GNU General Public License and
-// a copy of the GCC Runtime Library Exception along with this program;
-// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
-// <http://www.gnu.org/licenses/>.
-
-/** @file bits/stringfwd.h
- *  This is an internal header file, included by other library headers.
- *  Do not attempt to use it directly. @headername{string}
- */
-
-//
-// ISO C++ 14882: 21 Strings library
-//
-
-#ifndef _STRINGFWD_H
-#define _STRINGFWD_H 1
-
-#pragma GCC system_header
-
-#include <bits/c++config.h>
-#include <bits/memoryfwd.h>
-
-namespace std _GLIBCXX_VISIBILITY(default)
+int main()
 {
-_GLIBCXX_BEGIN_NAMESPACE_VERSION
+    cout << "Hello world!" << endl;
+    if (live){
 
-  /**
-   *  @defgroup strings Strings
-   *
-   *  @{
-  */
+        // establish sniffer
 
-  template<class _CharT>
-    struct char_traits;
+        /*
 
-  template<> struct char_traits<char>;
+        The first argument is the device
+        BUFSIZE is an integer which defines the maximum number of bytes to be captured by pcap
+        Third parameter is promisc, when set to false, brings the interface into promiscuous mode
+        (however, even if it is set to false, it is possible under specific cases for the interface to be in promiscuous mode, anyway).
+        to_ms is the read time out in milliseconds (a value of 0 means no time out;
+        on at least some platforms, this means that you may wait until a sufficient number of packets arrive before seeing any packets,
+        so you should use a non-zero timeout).
+        Lastly, ebuf is a string we can store any error messages within
+        The function returns our session handler.
+        */
+        handle = pcap_open_live(device, BUFSIZE, promisc,  to_ms, )
 
-#ifdef _GLIBCXX_USE_WCHAR_T
-  template<> struct char_traits<wchar_t>;
-#endif
+        if (handle == NULL) {
+            fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
+            return(2);
+        }
+    }
+    else {
+        // using recorded stored pcaps.
 
-#if ((__cplusplus >= 201103L) \
-     && defined(_GLIBCXX_USE_C99_STDINT_TR1))
-  template<> struct char_traits<char16_t>;
-  template<> struct char_traits<char32_t>;
-#endif
-
-_GLIBCXX_BEGIN_NAMESPACE_CXX11
-
-  template<typename _CharT, typename _Traits = char_traits<_CharT>,
-           typename _Alloc = allocator<_CharT> >
-    class basic_string;
-
-  /// A string of @c char
-  typedef basic_string<char>    string;   
-
-#ifdef _GLIBCXX_USE_WCHAR_T
-  /// A string of @c wchar_t
-  typedef basic_string<wchar_t> wstring;   
-#endif
-
-#if ((__cplusplus >= 201103L) \
-     && defined(_GLIBCXX_USE_C99_STDINT_TR1))
-  /// A string of @c char16_t
-  typedef basic_string<char16_t> u16string; 
-
-  /// A string of @c char32_t
-  typedef basic_string<char32_t> u32string; 
-#endif
-
-_GLIBCXX_END_NAMESPACE_CXX11
-
-  /** @}  */
-
-_GLIBCXX_END_NAMESPACE_VERSION
-} // namespace std
-
-#endif	// _STRINGFWD_H
+    }
+    return 0;
+}

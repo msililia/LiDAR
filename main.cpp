@@ -29,7 +29,7 @@ void my_callback(u_char *useless,const struct pcap_pkthdr* pkthdr,const u_char*
 
 int main()
 {
-    cout << "Hello world!" << endl;
+    cout << "Oh, hi Mark!" << endl;
     if (live){
         /*
        Device - device name
